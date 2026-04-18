@@ -1,0 +1,25 @@
+{
+  "name": "place-finder",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:web": "bun run --filter @place-finder/web dev",
+    "dev:api": "bun run --filter @place-finder/api dev",
+    "build": "bun run --filter '*' build",
+    "build:web": "bun run --filter @place-finder/web build",
+    "lint": "bunx @biomejs/biome lint .",
+    "format": "bunx @biomejs/biome format --write .",
+    "check": "bunx @biomejs/biome check --write .",
+    "typecheck": "bun run --filter '*' typecheck",
+    "add:web": "bun add --cwd apps/web",
+    "add:api": "bun add --cwd apps/api"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.12",
+    "typescript": "^6.0.3"
+  }
+}

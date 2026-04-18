@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+.env.*
+*.tsbuildinfo
+packages/api-client/generated/*
+!packages/api-client/generated/.gitkeep

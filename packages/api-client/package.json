@@ -1,0 +1,14 @@
+{
+  "name": "@place-finder/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./generated/index.ts",
+  "scripts": {
+    "generate": "echo 'TODO: Orval 等で OpenAPI クライアントを生成する'",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}
