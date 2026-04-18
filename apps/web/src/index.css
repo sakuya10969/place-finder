@@ -22,6 +22,6 @@ body,
 
 body {
   background:
-    radial-gradient(circle at top left, rgba(26, 60, 138, 0.08), transparent 28%),
-    linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+    radial-gradient(circle at top left, rgba(34, 139, 230, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
 }

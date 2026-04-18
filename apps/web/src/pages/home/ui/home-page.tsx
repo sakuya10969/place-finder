@@ -1,23 +1,27 @@
 import {
   Alert,
+  Box,
   Button,
   Card,
   Group,
   Loader,
-  SimpleGrid,
   Skeleton,
   Stack,
-  Tabs,
   Text,
   Title,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useGetApiPlacesSearch, useGetHealth } from "@place-finder/api-client/generated";
 import type {
   GetApiPlacesSearch200PlacesItem,
   GetApiPlacesSearchParams,
 } from "@place-finder/api-client/generated/model";
+import {
+  IconAlertCircle,
+  IconCurrentLocation,
+  IconRefresh,
+  IconSearch,
+} from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { PlaceCard } from "../../../entities/place/ui/place-card";
 import { PlacesMap } from "../../../features/map/ui/places-map";
@@ -28,16 +32,13 @@ const extractErrorMessage = (error: unknown) => {
   if (error instanceof Error) {
     return error.message;
   }
-
   return "検索に失敗しました。";
 };
 
 export const HomePage = () => {
-  const isMobile = useMediaQuery("(max-width: 48em)");
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [selectedRadius, setSelectedRadius] = useState(1000);
   const [selectedPlace, setSelectedPlace] = useState<GetApiPlacesSearch200PlacesItem | null>(null);
-  const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const {
     coordinates,
     error: geolocationError,
@@ -46,10 +47,7 @@ export const HomePage = () => {
   } = useGeolocation();
 
   const params = useMemo<GetApiPlacesSearchParams | null>(() => {
-    if (!coordinates) {
-      return null;
-    }
-
+    if (!coordinates) return null;
     return {
       lat: coordinates.lat,
       lng: coordinates.lng,
@@ -58,18 +56,12 @@ export const HomePage = () => {
     };
   }, [coordinates, selectedGenre, selectedRadius]);
 
-  const healthQuery = useGetHealth({
-    query: {
-      staleTime: 30000,
-      refetchInterval: 60000,
-    },
+  useGetHealth({
+    query: { staleTime: 30000, refetchInterval: 60000 },
   });
 
   const placesQuery = useGetApiPlacesSearch(params ?? { lat: 0, lng: 0 }, {
-    query: {
-      enabled: params !== null,
-      staleTime: 30000,
-    },
+    query: { enabled: params !== null, staleTime: 30000 },
   });
 
   const successfulPlacesResponse = placesQuery.data?.status === 200 ? placesQuery.data.data : null;
@@ -103,52 +95,62 @@ export const HomePage = () => {
     );
   }, [places]);
 
-  const listPane = (
+  return (
     <Stack gap="md">
-      <Card withBorder padding="lg">
-        <Stack gap="md">
-          <Group justify="space-between" align="flex-start">
-            <div>
-              <Title order={2} c="#0F1F4B">
-                現在地周辺のおすすめ
-              </Title>
-              <Text size="sm" c="dimmed">
-                距離・評価・営業状況をもとにおすすめ順で表示します。
-              </Text>
-            </div>
-            <Text size="sm" c={healthQuery.data?.status === 200 ? "brand.9" : "red"}>
-              API:{" "}
-              {healthQuery.data?.status === 200
-                ? "稼働中"
-                : healthQuery.isLoading
-                  ? "確認中"
-                  : "要確認"}
-            </Text>
-          </Group>
+      <Card withBorder padding="lg" style={{ borderColor: "#E5E7EB" }}>
+        <Group align="flex-start" justify="space-between" wrap="nowrap" gap="lg">
+          <Stack gap="md" style={{ flex: 1, minWidth: 0 }}>
+            <Group gap="xs">
+              <IconSearch size={22} color="#228BE6" />
+              <div>
+                <Title order={2} c="#1864AB">
+                  現在地周辺のおすすめ
+                </Title>
+                <Text size="sm" c="dimmed">
+                  距離・評価・営業状況をもとにおすすめ順で表示します。
+                </Text>
+              </div>
+            </Group>
 
-          <GenreFilter
-            selectedGenre={selectedGenre}
-            selectedRadius={selectedRadius}
-            onSelectGenre={setSelectedGenre}
-            onSelectRadius={setSelectedRadius}
-          />
-        </Stack>
+            <GenreFilter
+              selectedGenre={selectedGenre}
+              selectedRadius={selectedRadius}
+              onSelectGenre={setSelectedGenre}
+              onSelectRadius={setSelectedRadius}
+            />
+          </Stack>
+
+          <Box style={{ flexShrink: 0, width: 380, height: 260 }}>
+            <PlacesMap
+              center={coordinates}
+              places={places}
+              selectedPlace={selectedPlace}
+              onSelectPlace={setSelectedPlace}
+            />
+          </Box>
+        </Group>
       </Card>
 
       {isLoadingLocation ? (
-        <Card withBorder padding="lg">
+        <Card withBorder padding="lg" style={{ borderColor: "#E5E7EB" }}>
           <Group>
             <Loader color="brand" size="sm" />
+            <IconCurrentLocation size={18} color="#228BE6" />
             <Text>現在地を取得しています...</Text>
           </Group>
         </Card>
       ) : null}
 
       {geolocationError ? (
-        <Alert color="red" title="位置情報を取得できません">
+        <Alert color="red" title="位置情報を取得できません" icon={<IconAlertCircle size={20} />}>
           <Stack gap="xs">
             <Text size="sm">{geolocationError}</Text>
-            <Button color="brand" variant="outline" onClick={retry}>
+            <Button
+              color="brand"
+              variant="outline"
+              onClick={retry}
+              leftSection={<IconRefresh size={16} />}
+            >
               再試行
             </Button>
           </Stack>
@@ -164,7 +166,7 @@ export const HomePage = () => {
       ) : null}
 
       {!placesQuery.isLoading && places.length === 0 && params ? (
-        <Alert color="brand" title="候補が見つかりません">
+        <Alert color="brand" title="候補が見つかりません" icon={<IconSearch size={20} />}>
           条件を変えて再検索してください。
         </Alert>
       ) : null}
@@ -175,56 +177,10 @@ export const HomePage = () => {
             key={place.id}
             place={place}
             isSelected={selectedPlace?.id === place.id}
-            onSelect={() => {
-              setSelectedPlace(place);
-              if (isMobile) {
-                setMobileView("map");
-              }
-            }}
+            onSelect={() => setSelectedPlace(place)}
           />
         ))}
       </Stack>
-    </Stack>
-  );
-
-  const mapPane = (
-    <PlacesMap
-      center={coordinates}
-      places={places}
-      selectedPlace={selectedPlace}
-      onSelectPlace={setSelectedPlace}
-    />
-  );
-
-  return (
-    <Stack gap="lg">
-      {isMobile ? (
-        <Card withBorder padding="sm">
-          <Tabs
-            value={mobileView}
-            onChange={(value) => setMobileView((value as "list" | "map") ?? "list")}
-            color="brand"
-          >
-            <Tabs.List grow>
-              <Tabs.Tab value="list">一覧</Tabs.Tab>
-              <Tabs.Tab value="map">地図</Tabs.Tab>
-            </Tabs.List>
-          </Tabs>
-        </Card>
-      ) : null}
-
-      {isMobile ? (
-        mobileView === "list" ? (
-          listPane
-        ) : (
-          mapPane
-        )
-      ) : (
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" verticalSpacing="lg">
-          {listPane}
-          {mapPane}
-        </SimpleGrid>
-      )}
     </Stack>
   );
 };
