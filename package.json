@@ -9,6 +9,7 @@
     "dev": "bun run --filter '*' dev",
     "dev:web": "bun run --filter @place-finder/web dev",
     "dev:api": "bun run --filter @place-finder/api dev",
+    "generate": "bun run --filter @place-finder/api openapi:generate && bun run --filter @place-finder/api-client generate",
     "build": "bun run --filter '*' build",
     "build:web": "bun run --filter @place-finder/web build",
     "lint": "bunx @biomejs/biome lint .",
