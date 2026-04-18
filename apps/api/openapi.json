@@ -1,0 +1,403 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Place Finder API",
+    "description": "Development documentation",
+    "version": "0.1.0"
+  },
+  "tags": [
+    {
+      "name": "Places"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    },
+                    "timestamp": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "timestamp"
+                  ]
+                }
+              }
+            },
+            "description": "HTTP 200 response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "VALIDATION_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "INTERNAL_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "EXTERNAL_API_ERROR"
+                              ]
+                            }
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            },
+            "description": "HTTP 500 response"
+          }
+        },
+        "operationId": "getHealth",
+        "tags": [
+          "System"
+        ],
+        "summary": "Health check"
+      }
+    },
+    "/api/places/search": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "numeric",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "in": "query",
+            "name": "lat",
+            "required": true
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "numeric",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "in": "query",
+            "name": "lng",
+            "required": true
+          },
+          {
+            "schema": {
+              "minimum": 1,
+              "maximum": 50000,
+              "default": 1000,
+              "anyOf": [
+                {
+                  "format": "numeric",
+                  "default": 0,
+                  "type": "string"
+                },
+                {
+                  "minimum": 1,
+                  "maximum": 50000,
+                  "default": 1000,
+                  "type": "number"
+                }
+              ]
+            },
+            "in": "query",
+            "name": "radius",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "type",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "places": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "types",
+                          "location",
+                          "rating",
+                          "isOpen",
+                          "distance",
+                          "score"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "types": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "location": {
+                            "type": "object",
+                            "required": [
+                              "lat",
+                              "lng"
+                            ],
+                            "properties": {
+                              "lat": {
+                                "type": "number"
+                              },
+                              "lng": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "rating": {
+                            "type": "number",
+                            "nullable": true
+                          },
+                          "isOpen": {
+                            "type": "boolean",
+                            "nullable": true
+                          },
+                          "distance": {
+                            "type": "number"
+                          },
+                          "score": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "places"
+                  ]
+                }
+              }
+            },
+            "description": "HTTP 200 response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "VALIDATION_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "INTERNAL_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "EXTERNAL_API_ERROR"
+                              ]
+                            }
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            },
+            "description": "HTTP 400 response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "VALIDATION_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "INTERNAL_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "EXTERNAL_API_ERROR"
+                              ]
+                            }
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            },
+            "description": "HTTP 500 response"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "properties": {
+                        "code": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "enum": [
+                                "VALIDATION_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "INTERNAL_ERROR"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "enum": [
+                                "EXTERNAL_API_ERROR"
+                              ]
+                            }
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            },
+            "description": "HTTP 502 response"
+          }
+        },
+        "operationId": "getApiPlacesSearch",
+        "tags": [
+          "Places"
+        ],
+        "summary": "Search nearby places"
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  }
+}
