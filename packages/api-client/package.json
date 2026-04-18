@@ -5,10 +5,15 @@
   "type": "module",
   "main": "./generated/index.ts",
   "scripts": {
-    "generate": "echo 'TODO: Orval 等で OpenAPI クライアントを生成する'",
+    "generate": "orval --config ./orval.config.ts",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@tanstack/react-query": "^5.99.0",
+    "axios": "^1.15.0"
+  },
   "devDependencies": {
+    "orval": "^8.8.0",
     "typescript": "^6.0.3"
   }
 }
